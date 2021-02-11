@@ -1,16 +1,83 @@
 import 'package:cab_rider/screens/loginscreen.dart';
+import 'package:cab_rider/screens/mainpage.dart';
+import 'package:cab_rider/widgets/progress.dart';
+import 'package:cab_rider/widgets/taxibutton.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import '../brand_colors.dart';
 
-class RegistrationPage extends StatelessWidget {
-  const RegistrationPage({Key key}) : super(key: key);
-
+class RegistrationPage extends StatefulWidget {
   static const String id = 'registration';
+
+  @override
+  _RegistrationPageState createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  var fullNameController = TextEditingController();
+
+  var phoneController = TextEditingController();
+
+  var emailController = TextEditingController();
+
+  var passController = TextEditingController();
+
+  void showSnackbar(String title) {
+    final snackbar = SnackBar(
+        content: Text(
+      title,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 15),
+    ));
+    scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
+  void registerUser() async {
+    try {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => ProgressDialog(
+                status: 'Registering Your Account',
+              ));
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+              email: emailController.text, password: passController.text);
+      if (userCredential.user != null) {
+        DatabaseReference newUserRef = FirebaseDatabase.instance
+            .reference()
+            .child('users/${_auth.currentUser.uid}');
+
+        Map userMap = {
+          'Full Name': fullNameController.text,
+          'Email': emailController.text,
+          'Phone': phoneController.text,
+        };
+        newUserRef.set(userMap);
+        Navigator.pushNamedAndRemoveUntil(
+            context, MainPage.id, (route) => false);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showSnackbar('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        showSnackbar('The account already exists for that email.');
+      }
+    } catch (e) {
+      showSnackbar(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -39,7 +106,8 @@ class RegistrationPage extends StatelessWidget {
                   child: Column(
                     children: [
                       TextField(
-                        keyboardType: TextInputType.emailAddress,
+                        controller: fullNameController,
+                        keyboardType: TextInputType.text,
                         decoration: InputDecoration(
                             labelText: 'Full Name',
                             labelStyle: TextStyle(
@@ -52,6 +120,7 @@ class RegistrationPage extends StatelessWidget {
                         height: 10,
                       ),
                       TextField(
+                        controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                             labelText: 'Email Address',
@@ -65,7 +134,8 @@ class RegistrationPage extends StatelessWidget {
                         height: 10,
                       ),
                       TextField(
-                        obscureText: true,
+                        controller: phoneController,
+                        keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                             labelText: 'Phone Number',
                             labelStyle: TextStyle(
@@ -75,7 +145,8 @@ class RegistrationPage extends StatelessWidget {
                                 TextStyle(color: Colors.grey, fontSize: 10.0)),
                       ),
                       TextField(
-                        keyboardType: TextInputType.emailAddress,
+                        controller: passController,
+                        obscureText: true,
                         decoration: InputDecoration(
                             labelText: 'Password',
                             labelStyle: TextStyle(
@@ -90,23 +161,41 @@ class RegistrationPage extends StatelessWidget {
                       SizedBox(
                         height: 40,
                       ),
-                      RaisedButton(
-                        onPressed: () {},
-                        color: BrandColors.colorGreen,
-                        textColor: Colors.white,
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(25)),
-                        child: Container(
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              'Register',
-                              style: TextStyle(
-                                  fontSize: 18, fontFamily: 'Brand-Bold'),
-                            ),
-                          ),
-                        ),
-                      )
+                      TaxiButton(
+                          title: 'Register',
+                          color: BrandColors.colorGreen,
+                          onPressed: () async {
+                            var connectivityReult =
+                                await Connectivity().checkConnectivity();
+
+                            if (connectivityReult !=
+                                    ConnectivityResult.mobile &&
+                                connectivityReult != ConnectivityResult.wifi) {
+                              showSnackbar('No internet connectivity');
+                              return;
+                            }
+
+                            if (fullNameController.text.length < 3) {
+                              showSnackbar('Please provide a valid name');
+                              return;
+                            }
+                            if (phoneController.text.length < 10) {
+                              showSnackbar(
+                                  'Please provide a valid phone number');
+                              return;
+                            }
+                            if (!emailController.text.contains('@')) {
+                              showSnackbar(
+                                  'Please provide a valid email address');
+                              return;
+                            }
+                            if (passController.text.length < 8) {
+                              showSnackbar(
+                                  'Pasword must be 8 charcters in length');
+                              return;
+                            }
+                            registerUser();
+                          })
                     ],
                   ),
                 ),
