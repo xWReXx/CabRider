@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
               print('you have error! ${snapshot.error.toString()}');
               return Text('something went wrong');
             } else if (snapshot.hasData) {
-              return LoginPage();
+              return MainPage();
             } else {
               return Center(
                 child: CircularProgressIndicator(),

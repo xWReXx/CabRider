@@ -39,8 +39,18 @@ PODS:
     - FirebaseCore (~> 7.0)
     - leveldb-library (~> 1.22)
   - Flutter (1.0.0)
+  - geolocator (6.2.0):
+    - Flutter
+  - google_maps_flutter (0.0.1):
+    - Flutter
+    - GoogleMaps (< 3.10)
   - GoogleDataTransport (8.2.0):
     - nanopb (~> 2.30907.0)
+  - GoogleMaps (3.9.0):
+    - GoogleMaps/Maps (= 3.9.0)
+  - GoogleMaps/Base (3.9.0)
+  - GoogleMaps/Maps (3.9.0):
+    - GoogleMaps/Base
   - GoogleUtilities/AppDelegateSwizzler (7.2.2):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -72,6 +82,8 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_database (from `.symlinks/plugins/firebase_database/ios`)
   - Flutter (from `Flutter`)
+  - geolocator (from `.symlinks/plugins/geolocator/ios`)
+  - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
 
 SPEC REPOS:
   trunk:
@@ -81,6 +93,7 @@ SPEC REPOS:
     - FirebaseCoreDiagnostics
     - FirebaseDatabase
     - GoogleDataTransport
+    - GoogleMaps
     - GoogleUtilities
     - GTMSessionFetcher
     - leveldb-library
@@ -99,6 +112,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_database/ios"
   Flutter:
     :path: Flutter
+  geolocator:
+    :path: ".symlinks/plugins/geolocator/ios"
+  google_maps_flutter:
+    :path: ".symlinks/plugins/google_maps_flutter/ios"
 
 SPEC CHECKSUMS:
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
@@ -111,7 +128,10 @@ SPEC CHECKSUMS:
   FirebaseCoreDiagnostics: 35685db68b11fe7d19d2d8b557fd7e3a56ac81cc
   FirebaseDatabase: 22199cb121a527ae59df646d61426fbb12f5627a
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  geolocator: f5e3de65e241caba7ce3e8a618803387bda73384
+  google_maps_flutter: c7f9c73576de1fbe152a227bfd6e6c4ae8088619
   GoogleDataTransport: 1024b1a4dfbd7a0e92cb20d7e0a6f1fb66b449a4
+  GoogleMaps: 4b5346bddfe6911bb89155d43c903020170523ac
   GoogleUtilities: 31c5b01f978a70c6cff2afc6272b3f1921614b43
   GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
