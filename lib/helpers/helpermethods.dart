@@ -1,10 +1,13 @@
+import 'package:cab_rider/datamodels/address.dart';
+import 'package:cab_rider/dataprovider/appdata.dart';
 import 'package:cab_rider/helpers/requesthelper.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cab_rider/globalVariables.dart';
+import 'package:provider/provider.dart';
 
 class HelperMethods {
-  static Future<String> findCoordAddress(Position position) async {
+  static Future<String> findCoordAddress(Position position, context) async {
     String placeAddress = '';
 
     var connectivityResult = await Connectivity().checkConnectivity();
@@ -20,6 +23,14 @@ class HelperMethods {
 
     if (response != 'failed') {
       placeAddress = response['results'][0]['formatted_address'];
+
+      Address pickupAddress = new Address();
+      pickupAddress.long = position.longitude;
+      pickupAddress.lat = position.latitude;
+      pickupAddress.placeName = placeAddress;
+
+      Provider.of<AppData>(context, listen: false)
+          .updatePickupAddress(pickupAddress);
     }
 
     return placeAddress;
